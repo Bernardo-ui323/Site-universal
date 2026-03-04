@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Universe Dashboard</title>
+    <title>Dashboard Estelar</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
 </head>
 <body>
+
     <div class="stars"></div>
 
     <nav class="nav-tabs">
         <div class="search-container">
-            <input type="text" placeholder="Pesquisar..." id="searchBar">
+            <input type="text" placeholder="Explorar cosmos..." id="searchBar">
         </div>
         <div class="buttons-container">
             <button class="tab-btn active" onclick="openTab(event, 'inicio')">Início</button>
@@ -23,15 +24,15 @@
 
     <main class="content">
         <div id="inicio" class="tab-content active">
-            <h1>Bem-vindo, Comandante</h1>
+            <h1>Painel de Controle</h1>
             <div class="grid-links">
                 <a href="https://code.visualstudio.com/" target="_blank" class="glass-card">
                     <h3>VS Code</h3>
-                    <p>Baixar o melhor editor de código.</p>
+                    <p>Instalar editor de elite.</p>
                 </a>
                 <a href="https://github.com/" target="_blank" class="glass-card">
                     <h3>GitHub</h3>
-                    <p>Hospede seus projetos.</p>
+                    <p>Hospedar sua frota de projetos.</p>
                 </a>
             </div>
         </div>
@@ -43,11 +44,7 @@
                     <iframe src="https://www.youtube.com/embed/1uofzbOfjTA" frameborder="0" allowfullscreen></iframe>
                 </div>
                 <div class="video-item">
-                    <h3>Primeiros Passos</h3>
-                    <iframe src="https://www.youtube.com/embed/x6E_Xe_FiTI" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="video-item">
-                    <h3>Programar com IA</h3>
+                    <h3>IA na Programação</h3>
                     <iframe src="https://www.youtube.com/embed/itc13dM_M_4" frameborder="0" allowfullscreen></iframe>
                 </div>
             </div>
@@ -55,14 +52,17 @@
 
         <div id="social" class="tab-content">
             <div class="chat-container glass-card">
+                <div class="chat-header">
+                    <div class="status-dot"></div> Hub de Comunicação
+                </div>
                 <div id="chat-messages" class="chat-messages">
-                    <div class="msg bot"><span>Sistema:</span> Bem-vindo ao canal.</div>
+                    <div class="msg bot"><span>Sistema:</span> Conexão segura estabelecida.</div>
                 </div>
                 <div class="chat-controls">
                     <div class="chat-input-wrapper">
                         <label for="file-input" class="chat-icon">📎</label>
                         <input type="file" id="file-input" style="display:none" onchange="sendFileInfo()">
-                        <input type="text" id="chatInput" placeholder="Digite uma mensagem...">
+                        <input type="text" id="chatInput" placeholder="Mensagem...">
                         <button class="chat-icon" onclick="addEmoji('🚀')">🚀</button>
                     </div>
                     <button class="voice-btn" id="voiceBtn">🎤</button>
@@ -73,7 +73,7 @@
     </main>
 
     <script>
-        // LÓGICA DAS ABAS
+        // NAVEGAÇÃO ENTRE ABAS
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
             for (let i = 0; i < contents.length; i++) {
@@ -89,7 +89,7 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // CONEXÃO REAL DO CHAT
+        // CHAT REAL (ABLY)
         const ably = new Ably.Realtime('B3N38A.XmB8Lg:6nK5GjU1YI6p5X0K'); 
         const channel = ably.channels.get('comunidade-ti');
 
@@ -110,7 +110,7 @@
             messageBox.scrollTop = messageBox.scrollHeight;
         });
 
-        // ENTER PARA ENVIAR
+        // INPUT EVENTS
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
@@ -122,11 +122,12 @@
             if(file) channel.publish('message', `📎 Arquivo: ${file.name}`);
         }
 
+        // ANIMAÇÃO MICROFONE
         const voiceBtn = document.getElementById('voiceBtn');
         voiceBtn.addEventListener('click', function() {
             this.classList.toggle('recording');
-            const status = this.classList.contains('recording') ? "🎤 Gravando..." : "✅ Áudio enviado";
-            channel.publish('message', status);
+            const msg = this.classList.contains('recording') ? "🎤 Gravando áudio..." : "✅ Áudio enviado";
+            channel.publish('message', msg);
         });
     </script>
 </body>
