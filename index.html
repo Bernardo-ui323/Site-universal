@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Estelar</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <nav class="nav-tabs">
+        <div class="search-container">
+            <input type="text" placeholder="Pesquisar no cosmos..." id="searchBar">
+        </div>
+        <div class="buttons-container">
+            <button class="tab-btn active" onclick="openTab(event, 'inicio')">Início</button>
+            <button class="tab-btn" onclick="openTab(event, 'tutoriais')">Aprender</button>
+            <button class="tab-btn" onclick="openTab(event, 'social')">Comunidade</button>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div id="inicio" class="tab-content active">
+            <h1>Bem-vindo, Comandante</h1>
+            <div class="grid-links">
+                <a href="https://code.visualstudio.com/" target="_blank" class="glass-card">
+                    <h3>VS Code</h3>
+                    <p>Baixe o editor para começar a codar.</p>
+                </a>
+                <a href="https://github.com/" target="_blank" class="glass-card">
+                    <h3>GitHub</h3>
+                    <p>Hospede seus projetos e colabore.</p>
+                </a>
+            </div>
+        </div>
+
+        <div id="tutoriais" class="tab-content">
+            <h2>Academia de Voo</h2>
+            <div class="video-grid">
+                <div class="video-item">
+                    <h3>Codando no Visual Studio</h3>
+                    <iframe src="https://www.youtube.com/embed/1uofzbOfjTA" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="video-item">
+                    <h3>IA na Programação</h3>
+                    <iframe src="https://www.youtube.com/embed/itc13dM_M_4" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div id="social" class="tab-content">
+            <div class="chat-container glass-card">
+                <div id="chat-messages" class="chat-messages">
+                    <div class="msg bot"><span>Sistema:</span> Conexão estelar estabelecida.</div>
+                </div>
+                <div class="chat-controls">
+                    <div class="chat-input-wrapper">
+                        <label for="file-input" class="chat-icon">📎</label>
+                        <input type="file" id="file-input" style="display:none" onchange="sendFileInfo()">
+                        <input type="text" id="chatInput" placeholder="Digite uma mensagem...">
+                    </div>
+                    <button class="voice-btn" id="voiceBtn">🎤</button>
+                    <button class="send-btn" onclick="sendMessage()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. LÓGICA DAS ABAS
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].style.display = "none";
+                contents[i].classList.remove("active");
+            }
+            const buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // 2. CONFIGURAÇÃO DO CHAT REAL (ABLY)
+        const ably = new Ably.Realtime('B3N38A.XmB8Lg:6nK5GjU1YI6p5X0K'); 
+        const channel = ably.channels.get('comunidade-ti');
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if (input.value.trim() !== "") {
+                channel.publish('message', input.value);
+                input.value = '';
+            }
+        }
+
+        // RECEBER MENSAGENS
+        channel.subscribe('message', function(msg) {
+            const messageBox = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg user';
+            div.innerHTML = `<span>Explorador:</span> ${msg.data}`;
+            messageBox.appendChild(div);
+            messageBox.scrollTop = messageBox.scrollHeight;
+        });
+
+        // ENVIAR COM ENTER
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // ANIMAÇÃO DO MICROFONE
+        const voiceBtn = document.getElementById('voiceBtn');
+        if(voiceBtn) {
+            voiceBtn.addEventListener('click', function() {
+                this.classList.toggle('recording');
+                const status = this.classList.contains('recording') ? "🎤 Gravando..." : "✅ Mensagem de voz enviada!";
+                channel.publish('message', status);
+            });
+        }
+
+        function sendFileInfo() {
+            const file = document.getElementById('file-input').files[0];
+            if(file) channel.publish('message', `📎 Arquivo enviado: ${file.name}`);
+        }
+    </script>
+</body>
+</html>
